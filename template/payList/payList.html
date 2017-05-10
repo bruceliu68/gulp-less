@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,height=device-height"/>
+    <title>消费列表</title>
+    @@include('../common/commoncss.html')
+    <link rel="stylesheet" href="../../css/payList/payList.css?data=0">
+</head>
+<body>
+<div class="list">
+
+</div>
+<script type="text/html" id="list">
+    <%for(var i=0;i< data.length;i++){%>
+    <div class="box">
+        <%if(data[i].recordType == '续费'){%>
+            <p class="greenbg"><%:=data[i].recordType%></p>
+            <div><%:=data[i].createTime%><img src="<%:=data[i].photoSrc%>" class="u-pic" /></div>
+            <span class="green">+<%:=data[i].consumeValue%>
+        <%}else{%>
+            <p class="redbg"><%:=data[i].recordType%></p>
+            <div><%:=data[i].createTime%><img src="<%:=data[i].photoSrc%>" class="u-pic" /></div>
+            <span class="red">-<%:=data[i].consumeValue%>
+        <%}%>
+            <%if(data[i].consumeType == '0'){%>
+                <b>元</b>
+            <%}else{%>
+                <b>次</b>
+            <%}%>
+        </span>
+    </div>
+    <%}%>
+</script>
+@@include('../common/loading.html')
+@@include('../common/commonjs.html')
+<script src="../../js/payList/payList.js?data=0"></script>
+</body>
+</html>

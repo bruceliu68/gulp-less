@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,height=device-height"/>
+    <title>确认手机号</title>
+    @@include('../common/commoncss.html')
+    <link rel="stylesheet" href="../../css/binding/binding.css">
+</head>
+<body>
+<div class="wrap"></div>
+<script type="text/html" id="wrapbox">
+    <div class="g-hd">
+        <div class="pic"><img class="j-pic" src="<%:=imgSrc%>" /></div>
+        <p class="j-name"><%:=name%></p>
+    </div>
+    <div class="g-bd">
+        <div class="tab">
+            <ul class="clearfix">
+                <li>请确认手机号</li>
+            </ul>
+        </div>
+        <div class="tab-box">
+            <div class="box">
+                <p class="p1 j-phonenum"></p>
+                <button class="m-next j-confirm">确认绑定</button>
+            </div>
+        </div>
+    </div>
+</script>
+@@include('../common/loading.html')
+@@include('../common/commonjs.html')
+<script>
+    $(function(){
+        FastClick.attach(document.body);
+        //获取地址栏信息
+        function getQueryString(name){
+            var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if(r!=null)return  unescape(r[2]); return null;
+        }
+        var storeId = getQueryString('storeId');
+        var custId = getQueryString('custId');
+        var phone = getQueryString('phone');
+        //获取消息
+        function getInfo(){
+            $('#loadingToast').show();
+            $.ajax({
+                type:'post',
+                url:'/mc-wechat/cust/info',
+                dataType:'json',
+                contentType:"application/json; charset=UTF-8",
+                data:JSON.stringify({
+                    "storeId": storeId,
+                    "custId": custId
+                }),
+                success:function(msg){
+                    if(msg.code === 'ACK'){
+                        var data = msg.data;
+                        var Templ = document.getElementById('wrapbox').innerHTML;
+                        var tml = template(Templ,data);
+                        $('.wrap').html(tml);
+                        $('.j-phonenum').text(phone);
+                    }else{
+                        alert('请求出错啦');
+                    }
+                    $('#loadingToast').hide();
+                },
+                error:function(msg){
+                    console.log('请求出错啦');
+                }
+            });
+        }
+        getInfo();
+        $('body').on('click','.j-confirm',function(){
+            var phonenum = $('.j-phonenum').text();
+            $.ajax({
+                type:'post',
+                url:'/mc-wechat/cust/bind',
+                // dataType:'json',
+                contentType:"application/json; charset=UTF-8",
+                data:JSON.stringify({
+                    "storeId": storeId,
+                    "custId": custId,
+                    "phone": phonenum
+                }),
+                success:function(msg){
+                    msg = JSON.parse(msg);
+                    if(msg.code === 'ACK'){
+                        window.location.href = '../home/home.html?storeId=' + storeId + '&custId=' + custId;
+                    }else{
+                        alert('请求出错啦');
+                    }
+                },
+                error:function(msg){
+                    console.log('请求出错啦');
+                }
+            });
+        })
+    })
+</script>
+</body>
+</html>

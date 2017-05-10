@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,height=device-height"/>
+    <title>确认交易</title>
+    @@include('../common/commoncss.html')
+    <link rel="stylesheet" href="../../css/home/home.css">
+</head>
+<body>
+<div class="g-box"></div>
+<script type="text/html" id="info">
+    <div class="g-hd clearfix">
+        <div class="pic"><img src="<%:=storePhotoSrc%>" /></div>
+        <p><%:=storeName%></p>
+    </div>
+    <div class="yx-box"></div>
+    <div class="g-bd">
+        <div class="tab-box">
+            <%if(consumeType == '金额'){%>
+            <div class="box">
+                <div class="tab">
+                    <ul class="clearfix">
+                        <li>请输入消费金额</li>
+                    </ul>
+                </div>
+                <span class="text">元</span>
+                <input class="" type="text" value="1" />
+                <p>剩余可用金额：<span><%:=consumeValue%>元</span><a href="../payList/payList.html?storeId=<%:=storeId%>&custId=<%:=custId%>" class="m-detail">查看明细<span> ></span></a></p>
+                <button class="comfirmpay">确认支付</button>
+            </div>
+            <%}else{%>
+            <div class="box ">
+                <div class="tab">
+                    <ul class="clearfix">
+                        <li>请输入消费次数</li>
+                    </ul>
+                </div>
+                <span class="text">次</span>
+                <input class="" type="text" value="1" />
+                <p>剩余可用次数：<span><%:=consumeValue%>次</span><a href="../payList/payList.html?storeId=<%:=storeId%>&custId=<%:=custId%>" class="m-detail">查看明细<span> ></span></a></p>
+                <button class="comfirmpay">确认支付</button>
+            </div>
+            <%}%>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="yx">
+    <div class="m-yx">
+        <img src="<%:=picSrc%>" />
+        <div class="main">
+            <%if(detail.length == 1){%>
+            <ul class="xy-1">
+            <%}else if(detail.length == 2){%>
+            <ul class="xy-2">
+            <%}else{%>
+            <ul class="xy-3">
+            <%}%>
+                <%for(var i=0;i< detail.length;i++){%>
+                <li>充 ¥<%:=detail[i].key%> 送 ¥<%:=detail[i].value%></li>
+                <%}%>
+            </ul>
+            <p>活动截止日期：<%:=endTime%></p>
+        </div>
+    </div>
+</script>
+@@include('../common/loading.html')
+@@include('../common/commonjs.html')
+<script src="../../js/home/home.js"></script>
+</body>
+</html>

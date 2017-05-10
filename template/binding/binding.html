@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,height=device-height"/>
+    <title>绑定手机号</title>
+    @@include('../common/commoncss.html')
+    <link rel="stylesheet" href="../../css/binding/binding.css">
+</head>
+<body>
+<div class="wrap">
+
+</div>
+<script type="text/html" id="wrapbox">
+    <div class="g-hd">
+        <div class="pic"><img class="j-pic" src="<%:=imgSrc%>" /></div>
+        <p class="j-name"><%:=name%></p>
+    </div>
+    <div class="g-bd">
+        <div class="tab">
+            <ul class="clearfix">
+                <li>请输入手机号</li>
+            </ul>
+        </div>
+        <div class="tab-box">
+            <div class="box">
+                <ul class="clearfix">
+                    <li><span></span></li>
+                    <li><span></span></li>
+                    <li><span></span></li>
+                    <li><span></span></li>
+                    <li><span></span></li>
+                    <li><span></span></li>
+                    <li><span></span></li>
+                    <li><span></span></li>
+                    <li><span></span></li>
+                    <li><span></span></li>
+                    <li><span></span></li>
+                </ul>
+                <input class="j-phonenum" type="text" maxlength="11" />
+                <button class="m-next">下一步</button>
+            </div>
+        </div>
+    </div>
+</script>
+@@include('../common/loading.html')
+@@include('../common/alertDialog.html')
+@@include('../common/commonjs.html')
+<script>
+    $(function(){
+        FastClick.attach(document.body);
+        //获取地址栏信息
+        function getQueryString(name){
+            var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if(r!=null)return  unescape(r[2]); return null;
+        }
+        var storeId = parseInt(getQueryString('storeId'));
+        var custId = parseInt(getQueryString('custId'));
+
+        //获取消息
+        function getInfo(){
+            $('#loadingToast').show();
+            $.ajax({
+                type:'post',
+                url:'/mc-wechat/cust/info',
+                dataType:'json',
+                contentType:"application/json; charset=UTF-8",
+                data:JSON.stringify({
+                    "storeId": storeId,
+                    "custId": custId
+                }),
+                success:function(msg){
+                    if(msg.code === 'ACK'){
+                        var data = msg.data;
+                        var Templ = document.getElementById('wrapbox').innerHTML;
+                        var tml = template(Templ,data);
+                        $('.wrap').html(tml);
+                    }else{
+                        alert('请求出错啦');
+                    }
+                    $('#loadingToast').hide();
+                },
+                error:function(msg){
+                    console.log('请求出错啦');
+                }
+            });
+        }
+        getInfo();
+        $('body').on('click','.m-next',function(){
+            var phonenum = $('.j-phonenum').val();
+            if(phonenum){
+                if(phonenum.match(/^1[34578]\d{9}$/)){
+                    $.ajax({
+                        type:'post',
+                        url:'/mc-wechat/cust/check',
+                        dataType:'json',
+                        contentType:"application/json; charset=UTF-8",
+                        data:JSON.stringify({
+                            "storeId": storeId,
+                            "custId": custId,
+                            "phone": phonenum
+                        }),
+                        success:function(msg){
+                            if(msg.code === 'ACK'){
+                                window.location.href = './confirmBinding.html?phone=' + phonenum + '&storeId=' + storeId + '&custId=' + custId;
+                            }else{
+                                $('.j-alertp').text('请联系商户添加该手机号后再进行下一步操作');
+                                $('.j-alert').show();
+                            }
+                        },
+                        error:function(msg){
+                            console.log('请求出错啦');
+                        }
+                    });
+                }else {
+                    $('.j-alertp').text('请输入正确的手机号');
+                    $('.j-alert').show();
+                }
+            }else{
+                $('.j-alertp').text('请输入手机号');
+                $('.j-alert').show();
+            }
+        });
+        $('.j-alertcomfirm').click(function(){
+            $('.j-alert').hide();
+        });
+        $('body').on('input change','.box input[type=text]',function(){
+            var _this = $(this);
+            var _val = _this.val();
+            var _li = $('.tab-box .box ul li');
+            for(var j=0;j<_li.length;j++){
+                _li.eq(j).find('span').html('');
+            }
+            for(var i=0;i<_val.length;i++){
+                _li.eq(i).find('span').html(_val.substring(i,i+1));
+            }
+
+        });
+    })
+</script>
+</body>
+</html>

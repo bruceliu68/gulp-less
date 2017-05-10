@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,height=device-height"/>
+    <title>支付成功</title>
+    @@include('../common/commoncss.html')
+    <link rel="stylesheet" href="../../css/success/success.css">
+</head>
+<body>
+<div class="g-box"></div>
+<script type="text/html" id="info">
+    <div class="wrap">
+        <img src="../../image/common/success.png" />
+        <p>支付成功</p>
+        <%if(consumeType == '金额'){%>
+        <div class="d1"><%:=storeName%>已收到您的消费金额</div>
+        <div class="d2"><%:=consumeValue%>元</div>
+        <%}else{%>
+        <div class="d1"><%:=storeName%>已收到您的消费次数</div>
+        <div class="d2"><%:=consumeValue%>次</div>
+        <%}%>
+    </div>
+    <a href="../payList/payList.html?storeId=<%:=storeId%>&custId=<%:=custId%>" class="m-detail">查看明细<span> ></span></a>
+    <a href="../home/home.html?storeId=<%:=storeId%>&custId=<%:=custId%>">完 成</a>
+</script>
+@@include('../common/commonjs.html')
+<script>
+    $(function(){
+        FastClick.attach(document.body);
+        var data = JSON.parse(localStorage.params);
+        var Templ = document.getElementById('info').innerHTML;
+        var tml = template(Templ,data);
+        $('.g-box').html(tml);
+    })
+</script>
+</body>
+</html>
